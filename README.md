@@ -9,8 +9,9 @@ A desktop app for capturing ideas, generating project plans with Claude AI, and 
 - **AI-powered project plans** — Describe an idea in plain text and Claude generates a structured project plan with title, category, effort estimate, tags, and actionable steps
 - **Refine with feedback** — Not happy with the plan? Provide feedback to refine it, or regenerate entirely
 - **Customizable workflow** — Define your own status stages, categories, and effort levels from the Settings panel
+- **Inline editing** — Change category and status directly from the table. Add or remove tags from the expanded project view
 - **Filter and sort** — Filter projects by status, category, effort, or tags. Click any column header to sort (ascending, descending, or reset)
-- **Expandable project details** — Click any project to see its full plan, tags, and editable notes
+- **Expandable project details** — Click any project to see its full plan, manage tags, and edit notes
 - **Persistent local storage** — All data stored locally on your machine
 
 ## Tech Stack
@@ -117,11 +118,11 @@ Review the generated plan, refine it with feedback, or save it to your projects:
 
 ![Generated plan](screenshots/project_plan_generated_view.png)
 
-### Track Projects
+### Saved to Projects
 
-View all your projects with status, category, effort, and tags at a glance:
+Once you save a plan, it appears in your project tracker — here the newly added project is highlighted at the bottom:
 
-![Project tracker](screenshots/new_project_in_tracker.png)
+![New project in tracker](screenshots/new_project_in_tracker.png)
 
 ### Filter by Status
 

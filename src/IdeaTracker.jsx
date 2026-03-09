@@ -448,6 +448,8 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
   const [expandedId, setExpandedId] = useState(null);
   const [editingNotes, setEditingNotes] = useState(null);
   const [notesValue, setNotesValue] = useState("");
+  const [editingTags, setEditingTags] = useState(null);
+  const [newTagValue, setNewTagValue] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
   const [error, setError] = useState(null);
@@ -532,6 +534,40 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
       onRefresh();
     } catch {
       setError("Failed to save notes.");
+    }
+  };
+
+  const handleCategoryChange = async (id, category) => {
+    try {
+      await updateProject(id, { category });
+      onRefresh();
+    } catch {
+      setError("Failed to update category.");
+    }
+  };
+
+  const handleAddTag = async (id, tag) => {
+    const project = projects.find((p) => p.id === id);
+    if (!project || !tag.trim()) return;
+    const tags = [...(project.tags || []), tag.trim()];
+    try {
+      await updateProject(id, { tags });
+      onRefresh();
+      setNewTagValue("");
+    } catch {
+      setError("Failed to add tag.");
+    }
+  };
+
+  const handleRemoveTag = async (id, tagToRemove) => {
+    const project = projects.find((p) => p.id === id);
+    if (!project) return;
+    const tags = (project.tags || []).filter((t) => t !== tagToRemove);
+    try {
+      await updateProject(id, { tags });
+      onRefresh();
+    } catch {
+      setError("Failed to remove tag.");
     }
   };
 
@@ -693,9 +729,15 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
                       </button>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getCategoryColor(project.category, categories)}`}>
-                        {project.category}
-                      </span>
+                      <select
+                        value={project.category}
+                        onChange={(e) => handleCategoryChange(project.id, e.target.value)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${getCategoryColor(project.category, categories)}`}
+                      >
+                        {categories.map((c) => (
+                          <option key={c}>{c}</option>
+                        ))}
+                      </select>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${EFFORT_COLORS[project.effort] || "bg-gray-100 text-gray-800"}`}>
@@ -752,18 +794,60 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
                         )}
 
                         {/* All Tags */}
-                        {project.tags && project.tags.length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Technologies & Topics</h4>
-                            <div className="flex gap-1.5 flex-wrap">
-                              {project.tags.map((tag, i) => (
-                                <span key={i} className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+                        <div className="mb-4">
+                          <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Technologies & Topics</h4>
+                          <div className="flex gap-1.5 flex-wrap items-center">
+                            {(project.tags || []).map((tag, i) => (
+                              <span key={i} className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium inline-flex items-center gap-1">
+                                {tag}
+                                <button
+                                  onClick={() => handleRemoveTag(project.id, tag)}
+                                  className="text-indigo-400 hover:text-red-500 ml-0.5"
+                                  title="Remove tag"
+                                >
+                                  &times;
+                                </button>
+                              </span>
+                            ))}
+                            {editingTags === project.id ? (
+                              <form
+                                onSubmit={(e) => { e.preventDefault(); handleAddTag(project.id, newTagValue); }}
+                                className="inline-flex items-center gap-1"
+                              >
+                                <input
+                                  type="text"
+                                  value={newTagValue}
+                                  onChange={(e) => setNewTagValue(e.target.value)}
+                                  placeholder="New tag"
+                                  autoFocus
+                                  className="px-2 py-0.5 text-xs border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-indigo-500 w-24"
+                                  onBlur={() => { if (!newTagValue.trim()) setEditingTags(null); }}
+                                />
+                                <button
+                                  type="submit"
+                                  disabled={!newTagValue.trim()}
+                                  className="text-xs text-indigo-600 hover:text-indigo-800 font-medium disabled:opacity-50"
+                                >
+                                  Add
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setEditingTags(null); setNewTagValue(""); }}
+                                  className="text-xs text-gray-400 hover:text-gray-600"
+                                >
+                                  Cancel
+                                </button>
+                              </form>
+                            ) : (
+                              <button
+                                onClick={() => { setEditingTags(project.id); setNewTagValue(""); }}
+                                className="px-2 py-0.5 border border-dashed border-gray-300 rounded-full text-xs text-gray-400 hover:text-indigo-600 hover:border-indigo-300"
+                              >
+                                + Add tag
+                              </button>
+                            )}
                           </div>
-                        )}
+                        </div>
 
                         {/* Project Plan */}
                         {project.project_plan && project.project_plan.length > 0 && (
