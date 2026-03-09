@@ -77,23 +77,23 @@ Then open [http://localhost:5173](http://localhost:5173).
 
 ```
 project-tracker/
-  src/
-    IdeaTracker.jsx     # React frontend (single-file)
-    main.jsx            # React entry point
-    index.css           # Global styles (Tailwind imports)
-  assets/
-    icon.png            # App icon (1024x1024 source)
-    icon.icns           # macOS app bundle icon
-    icon-padded.png     # Dock icon (padded + rounded)
-  data/
-    projects.sample.json  # Sample project data
-  screenshots/          # App screenshots for documentation
-  electron.js           # Electron main process
-  server.js             # Express API server (Claude + CRUD)
-  index.html            # HTML shell (Vite entry point)
-  vite.config.js        # Vite configuration
-  tailwind.config.js    # Tailwind CSS configuration
-  postcss.config.js     # PostCSS configuration
+├── src/
+│   ├── IdeaTracker.jsx     # React frontend (single-file)
+│   ├── main.jsx            # React entry point
+│   └── index.css           # Global styles (Tailwind imports)
+├── assets/
+│   ├── icon.png            # App icon (1024x1024 source)
+│   ├── icon.icns           # macOS app bundle icon
+│   └── icon-padded.png     # Dock icon (padded + rounded)
+├── data/
+│   └── projects.sample.json  # Sample project data
+├── screenshots/            # App screenshots for documentation
+├── electron.js             # Electron main process
+├── server.js               # Express API server (Claude + CRUD)
+├── index.html              # HTML shell (Vite entry point)
+├── vite.config.js          # Vite configuration
+├── tailwind.config.js      # Tailwind CSS configuration
+└── postcss.config.js       # PostCSS configuration
 ```
 
 ## Data Storage
