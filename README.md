@@ -13,43 +13,11 @@ A desktop app for capturing ideas, generating project plans with Claude AI, and 
 - **Expandable project details** — Click any project to see its full plan, tags, and editable notes
 - **Persistent local storage** — All data stored locally on your machine
 
-## Screenshots
+## Tech Stack
 
-### Generate a Project Plan
-
-Enter your idea and Claude generates a structured plan:
-
-![Generating a plan](screenshots/new_idea_view.png)
-
-### Review and Refine
-
-Review the generated plan, refine it with feedback, or save it to your projects:
-
-![Generated plan](screenshots/project_plan_generated_view.png)
-
-### Track Projects
-
-View all your projects with status, category, effort, and tags at a glance:
-
-![Project tracker](screenshots/new_project_in_tracker.png)
-
-### Filter by Status
-
-Quickly filter projects by clicking any status in the toolbar:
-
-![Status filter](screenshots/status_filter_view.png)
-
-### Advanced Filters
-
-Use the Filters panel to narrow down by category, effort, or tags:
-
-![Filters](screenshots/filter_view.png)
-
-### Customize Settings
-
-Define your own categories, effort levels, and workflow statuses:
-
-![Settings](screenshots/settings_view.png)
+- **Frontend**: React, Tailwind CSS, Vite
+- **Backend**: Express.js, Anthropic Claude API
+- **Desktop**: Electron, electron-builder
 
 ## Prerequisites
 
@@ -61,7 +29,7 @@ Define your own categories, effort levels, and workflow statuses:
 1. Clone the repository and navigate to the project folder:
 
    ```bash
-   cd idea-tracker
+   cd project-tracker
    ```
 
 2. Install dependencies:
@@ -108,7 +76,7 @@ Then open [http://localhost:5173](http://localhost:5173).
 ## Project Structure
 
 ```
-idea-tracker/
+project-tracker/
   src/
     IdeaTracker.jsx     # React frontend (single-file)
     main.jsx            # React entry point
@@ -135,8 +103,40 @@ idea-tracker/
 
 Data includes `projects.json` (your projects) and `settings.json` (your custom categories, effort levels, and statuses). On first launch of the desktop app, sample data is copied from the bundled `projects.sample.json`.
 
-## Tech Stack
+## Screenshots
 
-- **Frontend**: React, Tailwind CSS, Vite
-- **Backend**: Express.js, Anthropic Claude API
-- **Desktop**: Electron, electron-builder
+### Generate a Project Plan
+
+Enter your idea and Claude generates a structured plan:
+
+![Generating a plan](screenshots/new_idea_view.png)
+
+### Review and Refine
+
+Review the generated plan, refine it with feedback, or save it to your projects:
+
+![Generated plan](screenshots/project_plan_generated_view.png)
+
+### Track Projects
+
+View all your projects with status, category, effort, and tags at a glance:
+
+![Project tracker](screenshots/new_project_in_tracker.png)
+
+### Filter by Status
+
+Quickly filter projects by clicking any status in the toolbar:
+
+![Status filter](screenshots/status_filter_view.png)
+
+### Advanced Filters
+
+Use the Filters panel to narrow down by category, effort, or tags:
+
+![Filters](screenshots/filter_view.png)
+
+### Customize Settings
+
+Define your own categories, effort levels, and workflow statuses:
+
+![Settings](screenshots/settings_view.png)
