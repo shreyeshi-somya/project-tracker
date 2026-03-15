@@ -196,6 +196,7 @@ function IdeaGenerator({ onSaved, categories }) {
           id: newId,
           idea: input.trim(),
           title: plan.title || input.trim().slice(0, 60),
+          description: plan.description || "",
           category: plan.category,
           effort: plan.effort,
           tags: plan.tags || [],
@@ -223,7 +224,7 @@ function IdeaGenerator({ onSaved, categories }) {
       setIdeas((prev) =>
         prev.map((i) =>
           i.id === item.id
-            ? { ...i, title: plan.title || i.title, category: plan.category, effort: plan.effort, tags: plan.tags || i.tags, project_plan: plan.project_plan }
+            ? { ...i, title: plan.title || i.title, description: plan.description || i.description, category: plan.category, effort: plan.effort, tags: plan.tags || i.tags, project_plan: plan.project_plan }
             : i
         )
       );
@@ -243,7 +244,7 @@ function IdeaGenerator({ onSaved, categories }) {
       setIdeas((prev) =>
         prev.map((i) =>
           i.id === item.id
-            ? { ...i, title: plan.title || i.title, category: plan.category, effort: plan.effort, tags: plan.tags || i.tags, project_plan: plan.project_plan }
+            ? { ...i, title: plan.title || i.title, description: plan.description || i.description, category: plan.category, effort: plan.effort, tags: plan.tags || i.tags, project_plan: plan.project_plan }
             : i
         )
       );
@@ -328,7 +329,7 @@ function IdeaGenerator({ onSaved, categories }) {
                       <span className="ml-2 text-xs text-green-600 font-normal">Saved to Projects</span>
                     )}
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">{item.idea}</p>
+                  <p className="text-sm text-gray-500 mt-1">{item.description || item.idea}</p>
                   {item.tags && item.tags.length > 0 && (
                     <div className="flex gap-1.5 mt-2 flex-wrap">
                       {item.tags.slice(0, 3).map((tag, i) => (
@@ -448,6 +449,8 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
   const [expandedId, setExpandedId] = useState(null);
   const [editingNotes, setEditingNotes] = useState(null);
   const [notesValue, setNotesValue] = useState("");
+  const [editingPlan, setEditingPlan] = useState(null);
+  const [planValue, setPlanValue] = useState([]);
   const [editingTags, setEditingTags] = useState(null);
   const [newTagValue, setNewTagValue] = useState("");
   const [sortKey, setSortKey] = useState(null);
@@ -534,6 +537,17 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
       onRefresh();
     } catch {
       setError("Failed to save notes.");
+    }
+  };
+
+  const handleSavePlan = async (id) => {
+    try {
+      const filtered = planValue.filter((step) => step.trim() !== "");
+      await updateProject(id, { project_plan: filtered });
+      setEditingPlan(null);
+      onRefresh();
+    } catch {
+      setError("Failed to save project plan.");
     }
   };
 
@@ -850,19 +864,89 @@ function ProjectsTable({ projects, onRefresh, categories, efforts, statuses }) {
                         </div>
 
                         {/* Project Plan */}
-                        {project.project_plan && project.project_plan.length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Project Plan</h4>
-                            <ul className="space-y-1 text-sm text-gray-700">
-                              {project.project_plan.map((step, i) => (
-                                <li key={i} className="flex items-start">
-                                  <span className="mr-2 text-blue-500">&#8226;</span>
-                                  {step}
-                                </li>
-                              ))}
-                            </ul>
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-xs font-semibold text-gray-500 uppercase">Project Plan</h4>
+                            {editingPlan !== project.id && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingPlan(project.id);
+                                  setPlanValue([...(project.project_plan || [])]);
+                                }}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                title="Edit project plan"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
+                              </button>
+                            )}
                           </div>
-                        )}
+                          {editingPlan === project.id ? (
+                            <div>
+                              <div className="space-y-2">
+                                {planValue.map((step, i) => (
+                                  <div key={i} className="flex items-start gap-2">
+                                    <span className="mr-1 text-blue-500 mt-2">&#8226;</span>
+                                    <textarea
+                                      value={step}
+                                      onChange={(e) => {
+                                        const updated = [...planValue];
+                                        updated[i] = e.target.value;
+                                        setPlanValue(updated);
+                                      }}
+                                      rows={2}
+                                      className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                                    />
+                                    <button
+                                      onClick={() => setPlanValue(planValue.filter((_, idx) => idx !== i))}
+                                      className="text-red-400 hover:text-red-600 mt-1.5"
+                                      title="Remove step"
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="flex gap-2 mt-3">
+                                <button
+                                  onClick={() => setPlanValue([...planValue, ""])}
+                                  className="px-3 py-1.5 text-xs border border-dashed border-gray-300 rounded-lg text-gray-500 hover:text-blue-600 hover:border-blue-300 font-medium"
+                                >
+                                  + Add step
+                                </button>
+                                <div className="ml-auto flex gap-2">
+                                  <button
+                                    onClick={() => handleSavePlan(project.id)}
+                                    className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={() => setEditingPlan(null)}
+                                    className="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              {project.project_plan && project.project_plan.length > 0 ? (
+                                <ul className="space-y-1 text-sm text-gray-700">
+                                  {project.project_plan.map((step, i) => (
+                                    <li key={i} className="flex items-start">
+                                      <span className="mr-2 text-blue-500">&#8226;</span>
+                                      {step}
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="text-sm text-gray-400">No project plan yet.</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
 
                         {/* Notes */}
                         <div>
