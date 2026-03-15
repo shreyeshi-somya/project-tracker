@@ -102,6 +102,7 @@ The user has reviewed the previous project plan and wants these changes: ${feedb
 
 Return a revised JSON object with:
 - title: a short descriptive project title (3-6 words)
+- description: a 1-2 sentence summary of what the project does and why it's useful (based on the project plan, not the raw idea)
 - category: one of ${categoryList} (infer from context)
 - effort: one of ${effortList}
 - tags: an array of 3-5 technology/topic tags relevant to this project (e.g. "AI/LLMs", "React", "Python", "Causal Inference", "Data Engineering", "Web Scraping", "NLP", "Statistics", etc.)
@@ -112,6 +113,7 @@ Return only valid JSON, no markdown.`;
     prompt = `Given this idea: ${idea}, return a JSON object with:
 
 - title: a short descriptive project title (3-6 words)
+- description: a 1-2 sentence summary of what the project does and why it's useful (based on the project plan, not the raw idea)
 - category: one of ${categoryList} (infer from context)
 - effort: one of ${effortList}
 - tags: an array of 3-5 technology/topic tags relevant to this project (e.g. "AI/LLMs", "React", "Python", "Causal Inference", "Data Engineering", "Web Scraping", "NLP", "Statistics", etc.)
@@ -138,7 +140,7 @@ Return only valid JSON, no markdown.`;
 });
 
 app.post("/api/save", async (req, res) => {
-  const { idea, title, category, effort, tags, project_plan } = req.body;
+  const { idea, title, description, category, effort, tags, project_plan } = req.body;
 
   if (!idea) {
     return res.status(400).json({ error: "Idea is required" });
@@ -149,7 +151,7 @@ app.post("/api/save", async (req, res) => {
   const project = {
     id: Date.now().toString(),
     title: title || idea,
-    description: idea,
+    description: description || idea,
     category,
     effort,
     tags: tags || [],
